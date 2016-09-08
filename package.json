@@ -1,11 +1,55 @@
 {
   "name": "react-async-flow",
-  "version": "0.0.1",
-  "description": "react-async-flow",
-  "main": "index.js",
+  "version": "0.0.2",
+  "description": "Awesome utilities for organizing asynchronous flow in react components",
+  "main": "lib/index.js",
+  "homepage": "https://github.com/tihonove/react-async-flow",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "rimraf lib && babel -d lib/ src/",
+    "prepublish": "npm run compile",
+    "lint": "eslint src tests",
+    "test": "mocha --opts ./tests/mocha.opts ./tests/**/*.test.js"
   },
-  "author": "tihonove",
-  "license": "WTFPL"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tihonove/react-async-flow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tihonove/react-async-flow/issues"
+  },
+  "author": "tihonove <tihonov.ea@gmail.com>",
+  "contributors": [
+    {
+      "name": "Eugene Tikhonov",
+      "email": "tihonov.ea@gmail.com"
+    }
+  ],
+  "files": [
+    "lib/",
+    "src/"
+  ],
+  "engines": {
+    "node": "*"
+  },
+  "license": "WTFPL",
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-polyfill": "^6.13.0",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "babel-register": "^6.14.0",
+    "chai": "^3.5.0",
+    "eslint": "^3.4.0",
+    "eslint-config-skbkontur-retail": "^1.0.4",
+    "mocha": "^3.0.2",
+    "rimraf": "^2.5.4"
+  },
+  "keywords": [
+    "react",
+    "javascript",
+    "async",
+    "observable",
+    "events",
+    "async flow"
+  ]
 }
