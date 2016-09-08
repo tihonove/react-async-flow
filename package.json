@@ -1,6 +1,6 @@
 {
   "name": "react-async-flow",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Awesome utilities for organizing asynchronous flow in react components",
   "main": "lib/index.js",
   "homepage": "https://github.com/tihonove/react-async-flow",
