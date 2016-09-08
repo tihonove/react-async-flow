@@ -1,38 +1,58 @@
+// @flow
+type Subscription = {
+    unsubscribe(): void;
+
+    next(...args: *[]): void;
+    error(...args: *[]): void;
+    complete(...args: *[]): void;
+};
+
+type Observer = {
+    next(...args: *[]): void;
+    error(...args: *[]): void;
+    complete(...args: *[]): void;
+};
+
 class SubscriptionObserver {
-    constructor(source, observer) {
+    source: SelfMadeActionsObservable;
+    observer: Observer;
+
+    constructor(source: SelfMadeActionsObservable, observer: Observer) {
         this.source = source;
         this.observer = observer;
     }
 
-    unsubscribe() {
+    unsubscribe(): void {
         this.source.unsubscribe(this);
     }
 
-    next(...value) {
+    next(...value: *[]): void {
         if (typeof this.observer.next === 'function') {
             this.observer.next(...value);
         }
     }
 
-    error(errorValue) {
+    error(...value: *[]): void {
         if (typeof this.observer.error === 'function') {
-            this.observer.error(errorValue);
+            this.observer.error(...value);
         }
     }
 
-    complete(completeValue) {
+    complete(...value: *[]): void {
         if (typeof this.observer.complete === 'function') {
-            this.observer.complete(completeValue);
+            this.observer.complete(...value);
         }
     }
 }
 
 export default class SelfMadeActionsObservable {
+    subscriptions: ?Set<Subscription>;
+
     constructor() {
         this.subscriptions = new Set();
     }
 
-    notify(...args) {
+    notify(...args: *[]): void {
         if (this.subscriptions) {
             for (const subscription of this.subscriptions) {
                 subscription.next(...args);
@@ -40,7 +60,7 @@ export default class SelfMadeActionsObservable {
         }
     }
 
-    close(result) {
+    close(result: *): void {
         if (this.subscriptions) {
             for (const subscription of this.subscriptions) {
                 subscription.complete(result);
@@ -49,7 +69,7 @@ export default class SelfMadeActionsObservable {
         }
     }
 
-    throw(error) {
+    throw(error: *): void {
         if (this.subscriptions) {
             for (const subscription of this.subscriptions) {
                 subscription.error(error);
@@ -58,13 +78,13 @@ export default class SelfMadeActionsObservable {
         }
     }
 
-    unsubscribe(subscription) {
+    unsubscribe(subscription : Subscription): void {
         if (this.subscriptions) {
             this.subscriptions.delete(subscription);
         }
     }
 
-    subscribe(observer) {
+    subscribe(observer: Observer): ?Subscription {
         if (this.subscriptions) {
             const subscription = new SubscriptionObserver(this, observer);
             this.subscriptions.add(subscription);
@@ -73,16 +93,19 @@ export default class SelfMadeActionsObservable {
         return undefined;
     }
 
+    // $FlowFixMe
     [Symbol.observable]() {
         return this;
     }
 
-    toPromise() {
+    toPromise(): Promise<*> {
         return new Promise((resolve, reject) => {
             const subscription = this.subscribe({
                 next(...value) {
-                    subscription.unsubscribe();
-                    resolve(...value);
+                    if (subscription) {
+                        subscription.unsubscribe();
+                        resolve(...value);
+                    }
                 },
                 complete() {
                     reject('Observable completed without matched elements');
@@ -94,7 +117,7 @@ export default class SelfMadeActionsObservable {
         });
     }
 
-    map(mapFunc) {
+    map(mapFunc: (...args: *[]) => *[]) {
         const resultObservable = new SelfMadeActionsObservable();
         this.subscribe({
             next(...value) {
@@ -110,14 +133,16 @@ export default class SelfMadeActionsObservable {
         return resultObservable;
     }
 
-    first(condition = () => true) {
+    first(condition: (a: *) => bool = () => true) {
         const resultObservable = new SelfMadeActionsObservable();
 
         const subscription = this.subscribe({
             next(...value) {
-                if (condition(...value)) {
-                    subscription.unsubscribe();
-                    resultObservable.notify(...value);
+                if (subscription) {
+                    if (condition(...value)) {
+                        subscription.unsubscribe();
+                        resultObservable.notify(...value);
+                    }
                 }
             },
             complete() {

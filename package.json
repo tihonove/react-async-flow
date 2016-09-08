@@ -8,7 +8,8 @@
     "compile": "rimraf lib && babel -d lib/ src/",
     "prepublish": "npm run compile",
     "lint": "eslint src tests",
-    "test": "mocha --opts ./tests/mocha.opts ./tests/**/*.test.js"
+    "test": "mocha --opts ./tests/mocha.opts ./tests/**/*.test.js",
+    "flow-check": "flow check"
   },
   "repository": {
     "type": "git",
@@ -41,6 +42,7 @@
     "chai": "^3.5.0",
     "eslint": "^3.4.0",
     "eslint-config-skbkontur-retail": "^1.0.4",
+    "flow-bin": "^0.31.1",
     "mocha": "^3.0.2",
     "rimraf": "^2.5.4"
   },

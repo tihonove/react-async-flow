@@ -1,13 +1,19 @@
+// @flow
 import Observable from './observable';
 
-export function event() {
+type EventObject = {
+
+};
+
+export function event(): EventObject {
     const observable = new Observable();
 
     const result = function(...args) {
         observable.notify({ event: result, payload: args });
     };
 
-    result[Symbol.observable] = function() {
+    // $FlowFixMe
+    result[Symbol.observable] = function(): Observable {
         return observable;
     };
 
@@ -30,6 +36,7 @@ export function event() {
     return result;
 }
 
-export function anyOf(...events) {
+export function anyOf(...events: EventObject[]) {
+    // $FlowFixMe
     return Promise.race(events.map(x => x[Symbol.observable]().toPromise()));
 }
